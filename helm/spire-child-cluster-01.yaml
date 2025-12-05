@@ -1,0 +1,7 @@
+tags:
+  nestedChildFull: true
+
+global:
+  spire:
+    clusterName: child01
+    upstreamSpireAddress: spire-server.spirenested.example.com

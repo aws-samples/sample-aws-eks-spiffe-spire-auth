@@ -1,0 +1,91 @@
+tags:
+  nestedRoot: true
+
+global:
+  spire:
+    recommendations:
+      enabled: true
+    namespaces:
+      create: true
+    ingressControllerType: "" 
+    clusterName: spire-root-cluster
+    trustDomain: spirenested.example.com
+    caSubject:
+      country: US
+      organization: example
+      commonName: spirenested.example.com
+
+spire-server:
+  replicaCount: 1
+  kind: statefulset
+  fullnameOverride: "spire-root-cluster"
+
+  persistence:
+    type: pvc
+    size: 1Gi
+    accessMode: ReadWriteOnce
+    storageClass: gp3
+
+  dataStore:
+    sql:
+      databaseType: mysql
+      databaseName: spireserver
+      host: "spire-datastore-mysqlv2.cluster-abc123def456.us-east-1.rds.amazonaws.com"
+      port: 3306
+      region: "us-east-1"
+      username: spireadmin
+      externalSecret:
+        enabled: true
+        name: spire-db-secret
+        key: password
+
+  logLevel: debug
+
+  serviceAccount:
+    create: true
+    name: "spire-server"
+
+  caTTL: 720h
+
+spiffe-oidc-discovery-provider:
+  enabled: true
+
+  ingress:
+    enabled: true
+    className: "alb"
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:111122223333:certificate/12345678-1234-1234-1234-123456789012
+      alb.ingress.kubernetes.io/ssl-redirect: '443'
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    hosts:
+      - host: oidc-discovery.spirenested.example.com
+        paths:
+          - path: /.well-known/openid-configuration
+            pathType: Prefix
+            backend:
+              service:
+                name: spire-spiffe-oidc-discovery-provider
+                port:
+                  number: 443
+          - path: /keys
+            pathType: Prefix
+            backend:
+              service:
+                name: spire-spiffe-oidc-discovery-provider
+                port:
+                  number: 443
+
+external-spire-server:
+  service:
+    type: LoadBalancer
+    port: 443
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: external
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
+      external-dns.alpha.kubernetes.io/hostname: spire-server.spirenested.example.com
+  ingress:
+    enabled: false

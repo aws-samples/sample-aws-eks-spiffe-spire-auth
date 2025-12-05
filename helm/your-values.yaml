@@ -1,0 +1,35 @@
+global:
+  openshift: false
+  spire:
+    recommendations:
+      enabled: true
+    namespaces:
+      create: true
+    ingressControllerType: "" 
+    clusterName: spire-root-cluster
+    trustDomain: spirenested.example.com
+    caSubject:
+      country: US
+      organization: example
+      commonName: spirenested.example.com
+
+external-spire-server:
+  logLevel: debug
+
+internal-spire-server:
+  logLevel: debug
+
+root-spire-server:
+  logLevel: debug
+
+spire-agent-downstream:
+  logLevel: debug
+
+spire-agent-upstream:
+  logLevel: debug
+
+downstream-spire-agent:
+  logLevel: debug
+
+upstream-spire-agent:
+  logLevel: debug
