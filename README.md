@@ -24,8 +24,11 @@ SPIRE (SPIFFE Runtime Environment) is an open-source implementation of the SPIFF
 - Valid service names are hereby normatively defined as follows:
   - MUST be at least 1 character and no more than 15 characters long
 
-
 The SPIRE Helm chart appends these identifiers to service names, causing deployment failures if too long.
+
+- Template generates: `prom-cm-{CLUSTER_ID}`  
+- With `ABCDEFG-qa-01`: becomes `prom-cm-ABCDEFG-qa-01` (21 characters) ❌
+- With `child01`: becomes `prom-cm-child01` (15 characters) ✅
 
 **Example of the constraint:**
 
