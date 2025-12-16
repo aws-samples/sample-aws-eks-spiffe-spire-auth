@@ -91,7 +91,7 @@ This architecture provides:
 ### Components
 
 1. **Root Cluster** (`spire-root-cluster`): Hosts the root SPIRE server
-2. **Child Clusters** (`spire-child-01`, `spire-child-02`): Host child SPIRE servers and workloads
+2. **Child Clusters** (`spire-child-cluster-01`, `spire-child-cluster-02`): Host child SPIRE servers and workloads
 3. **RDS MySQL**: Persistent datastore for the root SPIRE server
 4. **Kubeconfig Generator**: Script to create secure cluster access configurations
 
@@ -133,14 +133,14 @@ The deployment consists of three EKS clusters:
 #### Child Cluster 1 (`infrastructure/eks/spire-child-cluster-01/`)
 
 - **Purpose**: Hosts child SPIRE server and application workloads
-- **Name**: `spire-child-01`
+- **Name**: `spire-child-cluster-01`
 - **Region**: `us-east-1`
 - **Node Groups**: Mixed instance types for diverse workloads
 
 #### Child Cluster 2 (`infrastructure/eks/spire-child-cluster-02/`)
 
 - **Purpose**: Hosts child SPIRE server and application workloads
-- **Name**: `spire-child-02`
+- **Name**: `spire-child-cluster-02`
 - **Region**: `us-east-1`
 - **Node Groups**: Mixed instance types for diverse workloads
 
