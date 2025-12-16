@@ -17,7 +17,15 @@ SPIRE (SPIFFE Runtime Environment) is an open-source implementation of the SPIFF
 
 ### Critical Configuration Note: Service Name Length Constraints
 
-**IMPORTANT**: When deploying SPIRE nested, the cluster identifiers used in Helm commands must be **7 characters or fewer**. This is due to Kubernetes service name constraints (RFC 6335) that limit service names to 15 characters maximum. The SPIRE Helm chart appends these identifiers to service names, causing deployment failures if too long.
+**IMPORTANT**: When deploying SPIRE nested, the cluster identifiers used in Helm commands must be **7 characters or fewer**. This is due to Internet Assigned Numbers Authority (IANA) that constraints the limit  of the service names to 15 characters maximum.
+
+[RFC 6335 Section 5.1](https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1):
+
+- Valid service names are hereby normatively defined as follows:
+  - MUST be at least 1 character and no more than 15 characters long
+
+
+The SPIRE Helm chart appends these identifiers to service names, causing deployment failures if too long.
 
 **Example of the constraint:**
 
