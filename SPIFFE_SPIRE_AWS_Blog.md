@@ -212,7 +212,7 @@ We'll deploy three EKS clusters: a root cluster for the SPIRE trust anchor and t
 
 ### Deployment Steps
 
-Follow these steps in order to deploy the infrastructure components, starting with networking, then the database, and finally the EKS clusters.
+Follow these steps to deploy the infrastructure components, starting with networking, then the database, and finally the EKS clusters.
 
 #### 1. Obtain Networking Values
 
@@ -856,6 +856,6 @@ By following this post, you've learned how to deploy SPIRE in a nested configura
 
 The combination of AWS managed services (Amazon EKS, Amazon Aurora) with the Nested SPIRE architecture creates a production-ready identity infrastructure that can support enterprise-scale applications with stringent security requirements.
 
-As cloud-native architectures continue to evolve, SPIFFE/SPIRE will play an increasingly important role in securing distributed systems. Consider exploring integrations with service meshes like Istio and monitoring tools like Prometheus to further enhance your security posture.
+As cloud-native architecture continues to evolve, SPIFFE/SPIRE will play an increasingly important role in securing distributed systems. Consider exploring integrations with service meshes like Istio and monitoring tools like Prometheus to further enhance your security posture.
 
 For additional support and advanced configurations, refer to the [SPIRE documentation](https://spiffe.io/docs/) and the [Helm charts repository](https://github.com/spiffe/helm-charts-hardened).
