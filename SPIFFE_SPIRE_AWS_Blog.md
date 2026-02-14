@@ -1,4 +1,4 @@
-# Implement service-to-service authorization using SPIFFE/SPIRE on Amazon EKS
+# Implementing SPIFFE/SPIRE authorization on Amazon EKS
 
 ## Table of Contents
 
