@@ -142,11 +142,11 @@ Before deploying SPIFFE/SPIRE on Amazon EKS, verify you have the following prere
 
 ### Required Tools and Software
 
-- **AWS CLI**: Version 2.x, configured with appropriate credentials and permissions
-- **Terraform**: Version 1.0 or later for infrastructure provisioning
-- **kubectl**: Latest stable version for Kubernetes cluster management
-- **Helm**: Version 3.8 or later for package management
-- **kubectx** (optional): For easier cluster context switching
+- **AWS CLI**: Version 2.32.0 or newer ([installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)), configured with appropriate credentials and permissions
+- **Terraform**: Version 1.12.2 or newer ([installation guide](https://developer.hashicorp.com/terraform/install)) for infrastructure provisioning
+- **kubectl**: Version 1.34 or newer ([installation guide](https://kubernetes.io/docs/tasks/tools/#kubectl)) for Kubernetes cluster management
+- **Helm**: Version 3.12.2 (v3 only, not v4) ([installation guide](https://helm.sh/docs/v3/intro/install)) for package management
+- **kubectx**: Version 0.9.5 ([installation guide](https://github.com/ahmetb/kubectx/?tab=readme-ov-file#installation)) for easier cluster context switching
 
 ### AWS Account Requirements
 
@@ -729,7 +729,14 @@ eks_managed_node_groups = {
 }
 ```
 
-For more details, see: [IMDSv2 Requirement Breaks aws_mysql and aws_postgres Authentication](https://github.com/spiffe/spire/issues/6118)
+**Security Implications**: Allowing IMDSv1 increases the risk of Server-Side Request Forgery (SSRF) attacks, as IMDSv1 does not require session tokens. To mitigate this risk:
+
+- Implement network policies to restrict pod access to the metadata service
+- Monitor IMDSv1 usage through CloudWatch metrics and VPC Flow Logs
+- Apply defense-in-depth controls such as IAM role restrictions and security groups
+- Review the [Amazon EKS security best practices guide](https://docs.aws.amazon.com/eks/latest/userguide/best-practices-security.html) for additional recommendations
+
+For an extensive review of IMDSv2 security enhancements, see [Add defense in depth against open firewalls, reverse proxies, and SSRF vulnerabilities with enhancements to the EC2 Instance Metadata Service](https://aws.amazon.com/blogs/security/defense-in-depth-open-firewalls-reverse-proxies-ssrf-vulnerabilities-ec2-instance-metadata-service/). For more details on the SPIRE limitation, see: [IMDSv2 Requirement Breaks aws_mysql and aws_postgres Authentication](https://github.com/spiffe/spire/issues/6118)
 
 ### Verification Commands
 
@@ -810,30 +817,60 @@ openssl s_client -connect my-service:8443 -cert /path/to/cert.pem -key /path/to/
 
 ## Cleanup
 
-To tear down the infrastructure, run terraform destroy in reverse order:
+Before destroying the Terraform infrastructure, you must first uninstall Helm releases to remove AWS resources created by Kubernetes controllers (such as Application Load Balancers, security groups, and IAM roles).
 
-### 1. Destroy Child Cluster 02
+### 1. Uninstall Helm Releases from Child Cluster 02
+
+```bash
+kubectx arn:aws:eks:us-east-1:111122223333:cluster/spire-child-cluster-02
+helm -n spire-mgmt uninstall spire
+helm -n spire-mgmt uninstall spire-crds
+kubectl -n spire-system delete pvc -l app.kubernetes.io/instance=spire
+kubectl delete crds clusterfederatedtrustdomains.spire.spiffe.io clusterspiffeids.spire.spiffe.io clusterstaticentries.spire.spiffe.io
+```
+
+### 2. Uninstall Helm Releases from Child Cluster 01
+
+```bash
+kubectx arn:aws:eks:us-east-1:111122223333:cluster/spire-child-cluster-01
+helm -n spire-mgmt uninstall spire
+helm -n spire-mgmt uninstall spire-crds
+kubectl -n spire-system delete pvc -l app.kubernetes.io/instance=spire
+kubectl delete crds clusterfederatedtrustdomains.spire.spiffe.io clusterspiffeids.spire.spiffe.io clusterstaticentries.spire.spiffe.io
+```
+
+### 3. Uninstall Helm Releases from Root Cluster
+
+```bash
+kubectx arn:aws:eks:us-east-1:111122223333:cluster/spire-root-cluster
+helm -n spire-mgmt uninstall spire
+helm -n spire-mgmt uninstall spire-crds
+kubectl -n spire-mgmt delete pvc -l app.kubernetes.io/instance=spire
+kubectl delete crds clusterfederatedtrustdomains.spire.spiffe.io clusterspiffeids.spire.spiffe.io clusterstaticentries.spire.spiffe.io
+```
+
+### 4. Destroy Child Cluster 02
 
 ```bash
 cd infrastructure/eks/spire-child-cluster-02/
 terraform destroy
 ```
 
-### 2. Destroy Child Cluster 01
+### 5. Destroy Child Cluster 01
 
 ```bash
 cd ../spire-child-cluster-01/
 terraform destroy
 ```
 
-### 3. Destroy Root EKS Cluster
+### 6. Destroy Root EKS Cluster
 
 ```bash
 cd ../spire-root-cluster/
 terraform destroy
 ```
 
-### 4. Destroy Aurora MySQL
+### 7. Destroy Aurora MySQL
 
 ```bash
 cd ../../rds/spire-datastore/
@@ -857,5 +894,7 @@ By following this post, you've learned how to deploy SPIRE in a nested configura
 The combination of AWS managed services (Amazon EKS, Amazon Aurora) with the Nested SPIRE architecture creates a production-ready identity infrastructure that can support enterprise-scale applications with stringent security requirements.
 
 As cloud-native architecture continues to evolve, SPIFFE/SPIRE will play an increasingly important role in securing distributed systems. Consider exploring integrations with service meshes like Istio and monitoring tools like Prometheus to further enhance your security posture.
+
+**Ready to get started?** Clone the [sample repository](https://github.com/aws-samples/sample-aws-eks-spiffe-spire-auth) and deploy your own nested SPIRE environment on Amazon EKS. For questions or to share your implementation experiences, join the [SPIFFE community Slack](https://slack.spiffe.io/) or engage with the AWS community on [re:Post](https://repost.aws/).
 
 For additional support and advanced configurations, refer to the [SPIRE documentation](https://spiffe.io/docs/) and the [Helm charts repository](https://github.com/spiffe/helm-charts-hardened).
