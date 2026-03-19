@@ -21,12 +21,12 @@ When running distributed applications across multiple [Amazon Elastic Kubernetes
 
 **The Authentication Challenge**: While mTLS secures channels between specific workloads, teams also need flexible authentication for scenarios where direct mTLS isn't possible—such as when Layer 7 load balancers sit between services, or when multiple workloads send messages over a single encrypted channel. JSON Web Tokens (JWTs) provide this flexibility but require proper key management and validation.
 
-SPIFFE (Secure Production Identity Framework for Everyone) and its reference implementation SPIRE (SPIFFE Runtime Environment) solve both challenges by:
+SPIFFE (Secure Production Identity Framework for Everyone) and its reference implementation SPIRE (SPIFFE Runtime Environment) help address both challenges by:
 
 - **Attesting workload identity** at runtime in distributed systems
 - **Delivering short-lived, automatically rotated X.509 certificates** (X.509-SVIDs) for mTLS directly to workloads
 - **Generating and validating JWT-SVIDs** for flexible authentication scenarios
-- **Eliminating manual certificate management** through the SPIFFE Workload API
+- **Minimizing manual certificate management** through the SPIFFE Workload API
 
 This guide demonstrates deploying SPIRE in a nested configuration across multiple Amazon EKS clusters, enabling secure workload identity and authentication in distributed environments.
 
@@ -51,11 +51,11 @@ Before diving into the implementation, let's establish the foundational concepts
 - **Manual certificate management** becomes operationally complex
 - **Network perimeters blur** in multi-cloud and hybrid deployments
 
-SPIRE solves these challenges by providing **cryptographic identity** that moves with workloads, **automatic credential rotation**, and **zero-trust authentication** that works regardless of network location.
+SPIRE can help address these challenges by providing **cryptographic identity** that moves with workloads, enabling **automatic credential rotation**, and supporting **zero-trust authentication** that is designed to work across different network locations.
 
 ### The Need for Service-to-Service Authorization
 
-Traditional security models often rely on network policies or API gateways, which can be cumbersome and error-prone in microservices architectures. SPIFFE/SPIRE addresses this by:
+Traditional security models often rely on network policies or API gateways, which can be cumbersome and error-prone in microservices architectures. SPIFFE/SPIRE helps address this by:
 
 - Providing workload identities that are cryptographically verifiable
 - Enabling mutual TLS (mTLS) authentication between services
@@ -72,7 +72,7 @@ Nested SPIRE is a deployment architecture that allows SPIRE Servers to be "chain
 - The downstream server **obtains credentials via the Workload API** from its local agent
 - These credentials are used to **authenticate directly with the upstream SPIRE Server**
 - The upstream server issues an **intermediate Certificate Authority (CA)** to the downstream server
-- All servers in the chain can now **issue SVIDs within the same trust domain**
+- All servers in the chain are configured to **issue SVIDs within the same trust domain**
 
 **Key Benefits:**
 
@@ -112,7 +112,7 @@ Node attestors interrogate a node and its environment for information that only 
 - **Multi-node software system credentials** (such as Kubernetes Service Account tokens)
 - **Deployed server certificates**
 
-The result of successful node attestation is that the agent receives a unique **SPIFFE ID**, which serves as the "parent" identity for all workloads it manages.
+Upon successful node attestation, the SPIRE server issues a unique **SPIFFE ID** to the agent, which serves as the "parent" identity for all workloads it manages.
 
 ### Kubernetes Node Attestation (k8s_psat)
 
@@ -128,7 +128,7 @@ In our Nested SPIRE deployment, we use the **[k8s_psat plugin](https://github.co
 In a nested architecture, the **root SPIRE server must validate tokens from child cluster nodes**. This is why our deployment process includes:
 
 1. **Kubeconfig generation script** - Creates secure access credentials for each child cluster
-2. **Base64-encoded kubeconfig injection** - Provides the root server with child cluster API access:
+2. **Base64-encoded kubeconfig injection** - It provides the root server with child cluster API access:
 
    ```bash
    --set "external-spire-server.kubeConfigs.child01.kubeConfigBase64=$(cat ../script/spire-child-cluster-01.kubeconfig)"
@@ -146,7 +146,7 @@ Before deploying SPIFFE/SPIRE on Amazon EKS, verify you have the following prere
 - **Terraform**: Version 1.12.2 or newer ([installation guide](https://developer.hashicorp.com/terraform/install)) for infrastructure provisioning
 - **kubectl**: Version 1.34 or newer ([installation guide](https://kubernetes.io/docs/tasks/tools/#kubectl)) for Kubernetes cluster management
 - **Helm**: Version 3.12.2 (v3 only, not v4) ([installation guide](https://helm.sh/docs/v3/intro/install)) for package management
-- **kubectx**: Version 0.9.5 ([installation guide](https://github.com/ahmetb/kubectx/?tab=readme-ov-file#installation)) for easier cluster context switching
+- **kubectx**: Version 0.9.5 ([installation guide](https://github.com/ahmetb/kubectx/?tab=readme-ov-file#installation)) for cluster context switching
 
 ### AWS Account Requirements
 
