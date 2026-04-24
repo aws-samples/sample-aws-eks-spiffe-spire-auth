@@ -152,7 +152,7 @@ Before deploying SPIFFE/SPIRE on Amazon EKS, verify you have the following prere
 
 You'll need an AWS account with permissions to:
 
-- Create EKS clusters
+- Create Amazon Aurora and EKS clusters
 - Manage VPCs and subnets
 - Deploy IAM roles and policies
 
