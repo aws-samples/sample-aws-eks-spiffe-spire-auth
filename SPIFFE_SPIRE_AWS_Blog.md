@@ -898,3 +898,11 @@ As cloud-native architecture continues to evolve, SPIFFE/SPIRE will play an incr
 **Ready to get started?** Clone the [sample repository](https://github.com/aws-samples/sample-aws-eks-spiffe-spire-auth) and deploy your own nested SPIRE environment on Amazon EKS. For questions or to share your implementation experiences, join the [SPIFFE community Slack](https://slack.spiffe.io/) or engage with the AWS community on [re:Post](https://repost.aws/).
 
 For additional support and advanced configurations, refer to the [SPIRE documentation](https://spiffe.io/docs/) and the [Helm charts repository](https://github.com/spiffe/helm-charts-hardened).
+
+## Security
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
+## License
+
+This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
